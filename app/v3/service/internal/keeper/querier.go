@@ -105,9 +105,9 @@ func queryRequests(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 	iterator := k.ActiveBindRequestsIterator(ctx, params.DefChainID, params.ServiceName, params.BindChainID, params.Provider)
 	defer iterator.Close()
 
-	var requests []types.SvcRequest
+	var requests []types.Request
 	for ; iterator.Valid(); iterator.Next() {
-		var request types.SvcRequest
+		var request types.Request
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &request)
 		requests = append(requests, request)
 	}
@@ -134,7 +134,7 @@ func queryResponse(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, sd
 
 	response, found := k.GetResponse(ctx, params.ReqChainID, eHeight, rHeight, counter)
 	if !found {
-		return nil, types.ErrNoResponseFound(types.DefaultCodespace, params.RequestID)
+		return nil, types.ErrInvalidRequestID(types.DefaultCodespace, params.RequestID)
 	}
 
 	bz, err := codec.MarshalJSONIndent(k.cdc, response)
